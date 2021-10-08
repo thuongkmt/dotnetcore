@@ -50,9 +50,7 @@ namespace HttpClientTest
 
             using (var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
             {
-                var stream = await response.Content.ReadAsStreamAsync();
-
-                string json = new StreamReader(stream).ReadToEnd();
+                var json = await response.Content.ReadAsStringAsync();
 
                 return  JsonConvert.DeserializeObject<T>(json);
             }
