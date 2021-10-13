@@ -14,6 +14,7 @@ namespace CustomAuthorizeAttribute.FillterAttributes
     {
         /// <summary>  
         /// This will Authorize User  
+        /// Ref: https://www.c-sharpcorner.com/article/how-to-override-customauthorization-class-in-net-core/
         /// </summary>  
         /// <returns></returns>  
         public void OnAuthorization(AuthorizationFilterContext context)
