@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace CustomAuthorizeAttribute.FillterAttributes
@@ -19,7 +20,7 @@ namespace CustomAuthorizeAttribute.FillterAttributes
         /// <returns></returns>  
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var checkHeader = context.HttpContext.Request.Headers.ContainsKey("HeadLine");
+            var checkHeader = context.HttpContext.Request.Headers.ContainsKey("Authorization");
             if (!checkHeader)
             {
                 context.Result = new JsonResult("NotAuthorized")
@@ -27,9 +28,25 @@ namespace CustomAuthorizeAttribute.FillterAttributes
                     Value = new
                     {
                         Status = "Error",
-                        Message = "Invalid Token"
+                        Message = "Invalid Header"
                     }
                 };
+            }
+            else
+            {
+                var token = context.HttpContext.Request.Headers["Authorization"].ToString();
+                if(token != "hello-kitty")
+                {
+                    context.HttpContext.Response.StatusCode = (int) HttpStatusCode.Unauthorized;
+                    context.Result = new JsonResult("NotAuthorized")
+                    {
+                        Value = new
+                        {
+                            Status = "Error",
+                            Message = "Invalid Token"
+                        }
+                    };
+                }
             }
         }
     }
