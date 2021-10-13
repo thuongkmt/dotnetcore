@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using HttpClientTest.Models;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -13,67 +14,64 @@ namespace HttpClientTest
     {
         static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Welcome to HttpClientTest: ");
+            while (true)
+            {
+                var key = Console.ReadLine();
+                switch (key)
+                {
+                    case "M":
+                        Console.WriteLine("Input your path: ");
+                        string path = Console.ReadLine();
+                        if (string.IsNullOrEmpty(path))
+                        {
+                            path = "personal-info";
+                        }
+                        await MakeRequest(path);
+                        break;
+                    default: 
+                        break;
+                }
+            }
+        }
 
-            var httpClient = new HttpClientHelper<PersonalInfoList>(new HttpClient());
+        public static async Task MakeRequest(string path)
+        {
+            var httpClient = new HttpClientHelper<GitRepoResponseTest>(new HttpClient());
             //1. add header
-            var header = new HeaderDictionary();
-            header.Add("Type", "payment-history");
-            header.Add("Code", "xxp");
+            var headers = new HeaderDictionary();
+            headers.Add("Authorization", "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");//forbidden
+            headers.Add("Accept", "application/vnd.github.v3+json");
+            //2. add query-string
 
-            //2. add query string
-            var queryString = new NameValueCollection();
-            queryString.Add("query", "thuongkmt");
-
-            //3. authentication infor
-            var authType = "Bearer";
-            var token = "hello";
-            
-            //4. make request
-            var urlCloud = "https://localhost:5001/api/personal-info";
+            //3. make request
             var data = await httpClient.GetAsync(
-                url: urlCloud,
-                queryString,
-                header: header,
-                authType: authType,
-                token: token,
+                url: "https://api.github.com/repos/thuongkmt/dotnetcore",
+                queryString: null,
+                 header: headers,
+                authType: "",
+                token: "",
                 cancellationToken: CancellationToken.None);
 
             //
-
-            Console.ReadLine();
+            Console.WriteLine(JsonConvert.SerializeObject(data));
         }
     }
-    public class PersonalInfoList
+    public class GitRepoResponseTest
     {
-        [JsonProperty("personalInfo")]
-        public List<PersonalInfoItem> PersonalInfo { get; set; }
-    }
+        [JsonProperty("id")]
+        public int Id { get; set; }
 
-    public class PersonalInfoItem
-    {
+        [JsonProperty("node_id")]
+        public string NodeId { get; set; }
+
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("residentialAddress")]
-        public string ResidentialAddress { get; set; }
+        [JsonProperty("full_name")]
+        public string FullName { get; set; }
 
-        [JsonProperty("email")]
-        public string Email { get; set; }
-
-        [JsonProperty("mobile")]
-        public string Mobile { get; set; }
-
-        [JsonProperty("sameAsResidentialAddress")]
-        public bool SameAsResidentialAddress { get; set; }
-
-        [JsonProperty("postalAddress")]
-        public string PostalAddress { get; set; }
-
-        [JsonProperty("emailNotification")]
-        public bool EmailNotification { get; set; }
-
-        [JsonProperty("mobileTextNotification")]
-        public bool MobileTextNotification { get; set; }
+        [JsonProperty("private")]
+        public bool Private { get; set; }
     }
 }

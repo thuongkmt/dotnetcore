@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using HttpClientTest.Models;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -23,7 +25,7 @@ namespace HttpClientTest
             _client = client;
         }
 
-        public async Task<T> GetAsync(string url, NameValueCollection queryString, HeaderDictionary header, string authType, string token, CancellationToken cancellationToken)
+        public async Task<CommonResponse<T>> GetAsync(string url, NameValueCollection queryString, HeaderDictionary header, string authType, string token, CancellationToken cancellationToken)
         {
             HttpRequestMessage request = null;
             if (!string.IsNullOrEmpty(authType) && !string.IsNullOrEmpty(token))
@@ -48,11 +50,31 @@ namespace HttpClientTest
                 request = new HttpRequestMessage(HttpMethod.Get, queryStringUrl);
             }
 
-            using (var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
+            try
             {
-                var json = await response.Content.ReadAsStringAsync();
+                using (var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var dataResult = JsonConvert.DeserializeObject<T>(json);
 
-                return  JsonConvert.DeserializeObject<T>(json);
+                    var commonRespone = new CommonResponse<T>
+                    {
+                        Status = response.StatusCode.ToString(),
+                        Message = response.ReasonPhrase,
+                        Data = dataResult
+                    };
+                    return commonRespone;
+                }
+            }
+            catch(Exception ex)
+            {
+                var commonRespone = new CommonResponse<T>
+                {
+                    Status = HttpStatusCode.InternalServerError.ToString(),
+                    Message = ex.Message.ToString(),
+                    Data = null
+                };
+                return commonRespone;
             }
         }
 

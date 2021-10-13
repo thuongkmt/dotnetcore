@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using HttpClientTest.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -11,6 +12,6 @@ namespace HttpClientTest
 {
     public interface IHttpClientHelper<T> where T : class
     {
-        Task<T> GetAsync(string url, NameValueCollection queryString, HeaderDictionary header, string authType, string token, CancellationToken cancellationToken);
+        Task<CommonResponse<T>> GetAsync(string url, NameValueCollection queryString, HeaderDictionary header, string authType, string token, CancellationToken cancellationToken);
     }
 }
