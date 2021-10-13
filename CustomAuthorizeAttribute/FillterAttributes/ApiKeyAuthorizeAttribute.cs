@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CustomAuthorizeAttribute.FillterAttributes
 {
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)] // it means allow this can be anotation on the class  or directly on the method as well
     public class ApiKeyAuthorizeAttribute : Attribute, IAuthorizationFilter
     {
         /// <summary>  
